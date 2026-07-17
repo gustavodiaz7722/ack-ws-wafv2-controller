@@ -385,10 +385,11 @@ func customSetOutputGetLoggingConfiguration(
 		if err != nil {
 			var nfe *svcsdktypes.WAFNonexistentItemException
 			if errors.As(err, &nfe) {
-				// WAFNonexistentItemException is not a fatal error for a read operation.
-				// It implies that Logging has not been enabled using the PutLoggingConfiguration call.
-				// We log it and proceed, loggingConfigResp will be nil in this case.
+				// Logging is not enabled for this WebACL in AWS. latest is
+				// seeded from a copy of desired, so clear any inherited value
+				// to let the delta detect a pending change and apply it.
 				rlog.Info("Logging has not been enabled for the WebACL", "WebACL", *ko.Status.ACKResourceMetadata.ARN)
+				ko.Spec.LoggingConfiguration = nil
 			} else {
 				// For any other error, it's genuinely an issue with the GetLoggingConfiguration call.
 				return err
