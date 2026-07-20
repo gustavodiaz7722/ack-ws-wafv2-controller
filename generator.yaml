@@ -138,18 +138,20 @@ resources:
         from:
           operation: PutLoggingConfiguration
           path: LoggingConfiguration
-      # ResourceARN and ManagedByFirewallManager are read-only: they are
-      # populated by the service in the GetLoggingConfiguration response and are
-      # never set by users (ResourceARN is the WebACL's own ARN, derived from
-      # status; ManagedByFirewallManager is a service-managed flag). Ignore them
-      # in delta comparison so the observed values never trigger spurious
-      # logging updates.
+      # Service-populated fields the user may omit; late-init adopts observed values to avoid a perpetual delta.
+      # skip_incomplete_check: don't block sync since these only exist once logging is enabled.
       LoggingConfiguration.ResourceARN:
-        compare:
-          is_ignored: true
+        late_initialize:
+          skip_incomplete_check: {}
       LoggingConfiguration.ManagedByFirewallManager:
-        compare:
-          is_ignored: true
+        late_initialize:
+          skip_incomplete_check: {}
+      LoggingConfiguration.LogType:
+        late_initialize:
+          skip_incomplete_check: {}
+      LoggingConfiguration.LogScope:
+        late_initialize:
+          skip_incomplete_check: {}
     hooks:
       sdk_read_one_pre_build_request:
         template_path: hooks/webacl/sdk_read_one_pre_build_request.go.tpl

@@ -12,6 +12,7 @@ import (
 	svcsdktypes "github.com/aws/aws-sdk-go-v2/service/wafv2/types"
 
 	ackcompare "github.com/aws-controllers-k8s/runtime/pkg/compare"
+	ackerr "github.com/aws-controllers-k8s/runtime/pkg/errors"
 	"github.com/aws-controllers-k8s/runtime/pkg/requeue"
 	ackrtlog "github.com/aws-controllers-k8s/runtime/pkg/runtime/log"
 	svcsdk "github.com/aws/aws-sdk-go-v2/service/wafv2"
@@ -180,6 +181,17 @@ func setLoggingConfiguration(
 	}
 }
 
+// validateLoggingResourceARN ensures a user-supplied ResourceARN is either unset
+// or the WebACL's own ARN, returning a terminal error otherwise.
+func validateLoggingResourceARN(resourceARN *string, webACLARN string) error {
+	if resourceARN != nil && *resourceARN != webACLARN {
+		return ackerr.NewTerminalError(fmt.Errorf(
+			"invalid spec.loggingConfiguration.resourceARN %q: must be unset or the WebACL's own ARN %q",
+			*resourceARN, webACLARN))
+	}
+	return nil
+}
+
 // syncLoggingConfiguration syncs the WebACL's logging configuration by sending a PutLoggingConfiguration request
 func syncLoggingConfiguration(
 	ctx context.Context,
@@ -203,8 +215,14 @@ func syncLoggingConfiguration(
 		return nil
 	}
 
+	webACLARN := string(*ko.Status.ACKResourceMetadata.ARN)
+
+	if err := validateLoggingResourceARN(ko.Spec.LoggingConfiguration.ResourceARN, webACLARN); err != nil {
+		return err
+	}
+
 	sdkLoggingConfig := &svcsdktypes.LoggingConfiguration{
-		ResourceArn: aws.String(string(*ko.Status.ACKResourceMetadata.ARN)),
+		ResourceArn: aws.String(webACLARN),
 	}
 
 	if ko.Spec.LoggingConfiguration.LogDestinationConfigs != nil {

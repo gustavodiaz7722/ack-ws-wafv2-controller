@@ -187,11 +187,25 @@ func newResourceDelta(
 				}
 			}
 		}
+		if ackcompare.HasNilDifference(a.ko.Spec.LoggingConfiguration.ManagedByFirewallManager, b.ko.Spec.LoggingConfiguration.ManagedByFirewallManager) {
+			delta.Add("Spec.LoggingConfiguration.ManagedByFirewallManager", a.ko.Spec.LoggingConfiguration.ManagedByFirewallManager, b.ko.Spec.LoggingConfiguration.ManagedByFirewallManager)
+		} else if a.ko.Spec.LoggingConfiguration.ManagedByFirewallManager != nil && b.ko.Spec.LoggingConfiguration.ManagedByFirewallManager != nil {
+			if *a.ko.Spec.LoggingConfiguration.ManagedByFirewallManager != *b.ko.Spec.LoggingConfiguration.ManagedByFirewallManager {
+				delta.Add("Spec.LoggingConfiguration.ManagedByFirewallManager", a.ko.Spec.LoggingConfiguration.ManagedByFirewallManager, b.ko.Spec.LoggingConfiguration.ManagedByFirewallManager)
+			}
+		}
 		if len(a.ko.Spec.LoggingConfiguration.RedactedFields) != len(b.ko.Spec.LoggingConfiguration.RedactedFields) {
 			delta.Add("Spec.LoggingConfiguration.RedactedFields", a.ko.Spec.LoggingConfiguration.RedactedFields, b.ko.Spec.LoggingConfiguration.RedactedFields)
 		} else if len(a.ko.Spec.LoggingConfiguration.RedactedFields) > 0 {
 			if !equality.Semantic.Equalities.DeepEqual(a.ko.Spec.LoggingConfiguration.RedactedFields, b.ko.Spec.LoggingConfiguration.RedactedFields) {
 				delta.Add("Spec.LoggingConfiguration.RedactedFields", a.ko.Spec.LoggingConfiguration.RedactedFields, b.ko.Spec.LoggingConfiguration.RedactedFields)
+			}
+		}
+		if ackcompare.HasNilDifference(a.ko.Spec.LoggingConfiguration.ResourceARN, b.ko.Spec.LoggingConfiguration.ResourceARN) {
+			delta.Add("Spec.LoggingConfiguration.ResourceARN", a.ko.Spec.LoggingConfiguration.ResourceARN, b.ko.Spec.LoggingConfiguration.ResourceARN)
+		} else if a.ko.Spec.LoggingConfiguration.ResourceARN != nil && b.ko.Spec.LoggingConfiguration.ResourceARN != nil {
+			if *a.ko.Spec.LoggingConfiguration.ResourceARN != *b.ko.Spec.LoggingConfiguration.ResourceARN {
+				delta.Add("Spec.LoggingConfiguration.ResourceARN", a.ko.Spec.LoggingConfiguration.ResourceARN, b.ko.Spec.LoggingConfiguration.ResourceARN)
 			}
 		}
 	}
