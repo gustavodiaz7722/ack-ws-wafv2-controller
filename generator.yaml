@@ -138,20 +138,6 @@ resources:
         from:
           operation: PutLoggingConfiguration
           path: LoggingConfiguration
-      # Service-populated fields the user may omit; late-init adopts observed values to avoid a perpetual delta.
-      # skip_incomplete_check: don't block sync since these only exist once logging is enabled.
-      LoggingConfiguration.ResourceARN:
-        late_initialize:
-          skip_incomplete_check: {}
-      LoggingConfiguration.ManagedByFirewallManager:
-        late_initialize:
-          skip_incomplete_check: {}
-      LoggingConfiguration.LogType:
-        late_initialize:
-          skip_incomplete_check: {}
-      LoggingConfiguration.LogScope:
-        late_initialize:
-          skip_incomplete_check: {}
     hooks:
       sdk_read_one_pre_build_request:
         template_path: hooks/webacl/sdk_read_one_pre_build_request.go.tpl
